@@ -7,6 +7,9 @@ class Api_auth_model extends CI_Model
         parent::__construct();
         
         $this->load->model("api_user_model");
+        $this->load->model("auth_model");
+        $this->load->model("api_email_model");
+        $this->load->model("api_general_settings");
     }
 
 
@@ -32,6 +35,43 @@ class Api_auth_model extends CI_Model
         	return true;
         }else{
         	return false;
+        }
+    }
+
+    public function register($datas)
+    {
+        $this->load->library('bcrypt');
+
+        if (!$datas['username'] || !$datas['email']) {
+        	return false;
+        }
+
+        $data['username'] = $datas['username'];
+        $data['email'] = $datas['email'];
+        $data['password'] = $this->bcrypt->hash_password($datas['password']);
+        $data['user_type'] = "registered";
+        $data["slug"] = $this->auth_model->generate_uniqe_slug($datas["username"]);
+        $data['banned'] = 0;
+        $data['role'] = "vendor";
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['token'] = generate_token();
+
+        print_r($data);
+
+        if ($this->db->insert('users', $data)) {
+            $last_id = $this->db->insert_id();
+            if ($this->api_general_settings->getValueOf('email_verification') == 1) {
+                $data['email_status'] = 0;
+                echo('satu');
+                echo($last_id);
+                $this->api_email_model->send_email_activation($last_id);
+            } else {
+            	echo('dua');
+                $data['email_status'] = 1;
+            }
+            return $this->auth_model->get_user($last_id);
+        } else {
+            return false;
         }
     }
 }
