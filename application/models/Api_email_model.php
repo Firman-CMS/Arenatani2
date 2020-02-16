@@ -144,7 +144,6 @@ class Api_email_model extends CI_Model
             if ($this->email->send()) {
                 return true;
             } else {
-                $this->session->set_flashdata('error', $this->email->print_debugger(array('headers')));
                 return false;
             }
         }

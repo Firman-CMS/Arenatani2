@@ -23,21 +23,20 @@ class User extends REST_Controller{
 		if (!$this->auth_model->is_unique_email($post['email'])) {
 			$this->return['message'] = "Email ini sudah di pakai !";
 
-        }elseif (!$this->auth_model->is_unique_username($post['username'])) {
+		}elseif (!$this->auth_model->is_unique_username($post['username'])) {
         	echo('gssgd');
 			$this->return['message'] = "Nama pengguna telah digunakan !";
 
-        }else{
+		}else{
 
-        	$user = $this->api_auth_model->register($post);
-        	if ($user) {
-        		$this->return['status'] = true;
-        		$this->return['message'] = "Success";
-        	}
+			$user = $this->api_auth_model->register($post);
+			if ($user) {
+				$this->return['status'] = true;
+				$this->return['message'] = "Success";
+			}
 		}
 
 		$this->response($this->return);
 	}
-
 }
 ?>
