@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>ic_chat_off</title>
+    <desc>Created with Sketch.</desc>
+    <g id="ic_chat_off" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        <path d="M12.6779802,2 C6.79015775,2 2.35596042,6.32571429 2.35596042,11.6428571 C2.35596042,13.5017857 2.58624824,14.945 3.69711113,16.5014286 C3.48675548,18.8360714 2.92295964,20.5692857 2.10431669,21.3903571 C1.99611345,21.4989286 1.96906264,21.665 2.03740153,21.8021429 C2.09826585,21.9246429 2.22248602,22 2.35596042,22 C2.37233327,22 2.38906207,21.9989286 2.40579086,21.9964286 C2.5499432,21.9760714 5.89854879,21.4921429 8.3203082,20.09 C9.69598428,20.6467857 11.1609992,21.2857143 12.6779802,21.2857143 C18.5658027,21.2857143 23,16.96 23,11.6428571 C23,6.32571429 18.5658027,2 12.6779802,2 Z" id="Path" fill="#CCCCCC" fill-rule="nonzero" transform="translate(12.500000, 12.000000) scale(-1, 1) translate(-12.500000, -12.000000) "></path>
+    </g>
+</svg>

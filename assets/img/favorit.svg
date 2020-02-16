@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>ic_favorites_off</title>
+    <desc>Created with Sketch.</desc>
+    <g id="ic_favorites_off" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        <path d="M23,8.92307692 C23,5.65179843 20.3400539,3 17.0588895,3 C14.9163499,3 13.0452388,4.13443732 11.999933,5.8298166 C10.9547612,4.13443732 9.08284641,3 6.9403514,3 C3.65918708,3 1,5.65179843 1,8.92307692 C1,10.7041043 1.79160333,12.2974982 3.03921911,13.3825677 L11.4577903,21.7761307 C11.601564,21.9194712 11.7965514,22 11.999933,22 C12.2033147,22 12.3983021,21.9194712 12.5420757,21.7761307 L20.9606469,13.3825677 C22.2083074,12.2974982 23,10.7041043 23,8.92307692 Z" id="Shape" fill="#CCCCCC" fill-rule="nonzero"></path>
+    </g>
+</svg>
