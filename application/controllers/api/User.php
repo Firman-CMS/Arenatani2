@@ -24,7 +24,6 @@ class User extends REST_Controller{
 			$this->return['message'] = "Email ini sudah di pakai !";
 
 		}elseif (!$this->auth_model->is_unique_username($post['username'])) {
-        	echo('gssgd');
 			$this->return['message'] = "Nama pengguna telah digunakan !";
 
 		}else{

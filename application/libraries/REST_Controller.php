@@ -427,7 +427,7 @@ abstract class REST_Controller extends \CI_Controller {
         $language = $this->config->item('rest_language');
         if ($language === NULL)
         {
-            $language = 'english';
+            $language = 'indonesia';
         }
 
         // Load the language file
