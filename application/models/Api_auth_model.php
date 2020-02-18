@@ -56,17 +56,12 @@ class Api_auth_model extends CI_Model
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['token'] = generate_token();
 
-        print_r($data);
-
         if ($this->db->insert('users', $data)) {
             $last_id = $this->db->insert_id();
             if ($this->api_general_settings->getValueOf('email_verification') == 1) {
                 $data['email_status'] = 0;
-                echo('satu');
-                echo($last_id);
                 $this->api_email_model->send_email_activation($last_id);
             } else {
-            	echo('dua');
                 $data['email_status'] = 1;
             }
             return $this->auth_model->get_user($last_id);

@@ -12,7 +12,7 @@ class Api_email_model extends CI_Model
     public function __construct(){
         parent::__construct();
         $this->load->model("api_general_settings");
-        
+        $this->load->model("settings_model");
     }
 
     public function send_email_activation($user_id)
@@ -34,8 +34,42 @@ class Api_email_model extends CI_Model
             $data = array(
                 'subject' => trans("confirm_your_email"),
                 'to' => $user->email,
-                'template_path' => "email/email_activation",
-                'token' => $token
+                'template_path' => "email/email_activation_api",
+                'token' => $token,
+                'general_settings' => $this->api_general_settings->getAll(),
+                'settings' => $this->settings_model->get_settings('2')
+            );
+
+            $this->send_email($data);
+        }
+    }
+
+    //send email reset password
+    public function send_email_reset_password($user_id)
+    {
+        $user_id = clean_number($user_id);
+        $user = $this->auth_model->get_user($user_id);
+        echo(" ====== ");
+        print_r($user);
+        if (!empty($user)) {
+            $token = $user->token;
+            //check token
+            if (empty($token)) {
+                $token = generate_token();
+                $data = array(
+                    'token' => $token
+                );
+                $this->db->where('id', $user->id);
+                $this->db->update('users', $data);
+            }
+
+            $data = array(
+                'subject' => trans("reset_password"),
+                'to' => $user->email,
+                'template_path' => "email/email_reset_password",
+                'token' => $token,
+                'general_settings' => $this->api_general_settings->getAll(),
+                'settings' => $this->settings_model->get_settings('2')
             );
 
             $this->send_email($data);
@@ -50,17 +84,14 @@ class Api_email_model extends CI_Model
                 $transport = (new Swift_SmtpTransport($this->api_general_settings->getValueOf('mail_host'), $this->api_general_settings->getValueOf('mail_port'), 'tls'))
                     ->setUsername($this->api_general_settings->getValueOf('mail_username'))
                     ->setPassword($this->api_general_settings->getValueOf('mail_password'));
-
                 // Create the Mailer using your created Transport
                 $mailer = new Swift_Mailer($transport);
-
                 // Create a message
                 $message = (new Swift_Message($this->api_general_settings->getValueOf('application_name')))
                     ->setFrom(array($this->api_general_settings->getValueOf('mail_username') => $this->api_general_settings->getValueOf('application_name')))
                     ->setTo([$data['to'] => ''])
                     ->setSubject($data['subject'])
                     ->setBody($this->load->view($data['template_path'], $data, TRUE), 'text/html');
-
                 //Send the message
                 $result = $mailer->send($message);
                 if ($result) {
@@ -131,7 +162,6 @@ class Api_email_model extends CI_Model
 
             //initialize
             $this->email->initialize($config);
-
             //send email
             $message = $this->load->view($data['template_path'], $data, TRUE);
             $this->email->from($settings->mail_username, $settings->application_name);

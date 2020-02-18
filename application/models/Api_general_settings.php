@@ -26,4 +26,11 @@ class Api_general_settings extends CI_Model
         return $result;
     }
 
+    public function getAll()
+    {
+        $this->db->where('id', 1);
+        $query = $this->db->get($this->tabel)->row();
+        return $query;
+    }
+
 }
