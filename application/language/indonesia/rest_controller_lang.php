@@ -23,3 +23,5 @@ $lang['text_rest_unsupported'] = 'Unsupported protocol';
  */
 $lang["confirm_your_email"] = "Konfirmasikan Email Anda";
 $lang["msg_confirmation_email"] = "Silakan klik tombol di bawah untuk mengkonfirmasi email Anda.";
+$lang["reset_password"] = "Setel Ulang Kata Sandi";
+$lang["email_reset_password"] = "Silakan klik tombol di bawah ini untuk mengatur ulang kata sandi Anda.";
