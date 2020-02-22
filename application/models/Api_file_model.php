@@ -10,14 +10,25 @@ class Api_file_model extends CI_Model
     }
 
 
-    public function get_image_by_product($product_id)
+    public function get_image_by_product($productId)
 	{
-		$this->db->where('product_id', $product_id);
+		$this->db->where('product_id', $productId);
 		$this->db->order_by('images.is_main', 'DESC');
 		$query = $this->db->get($this->tabel);
 		$row = $query->row();
-		
+
 		return $row;
+	}
+
+
+	public function get_product_images($productId)
+	{
+		$this->db->where('product_id', $productId);
+		$this->db->order_by('images.is_main', 'DESC');
+		$query = $this->db->get('images');
+		$rows = $query->result();
+		
+		return $rows;
 	}
 
 }
