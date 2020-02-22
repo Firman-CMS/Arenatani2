@@ -37,7 +37,8 @@ class Api_email_model extends CI_Model
                 'template_path' => "email/email_activation_api",
                 'token' => $token,
                 'general_settings' => $this->api_general_settings->getAll(),
-                'settings' => $this->settings_model->get_settings('2')
+                'settings' => $this->settings_model->get_settings('2'),
+                'lang_base_url' => base_url()
             );
 
             $this->send_email($data);
@@ -49,8 +50,6 @@ class Api_email_model extends CI_Model
     {
         $user_id = clean_number($user_id);
         $user = $this->auth_model->get_user($user_id);
-        echo(" ====== ");
-        print_r($user);
         if (!empty($user)) {
             $token = $user->token;
             //check token
@@ -66,10 +65,11 @@ class Api_email_model extends CI_Model
             $data = array(
                 'subject' => trans("reset_password"),
                 'to' => $user->email,
-                'template_path' => "email/email_reset_password",
+                'template_path' => "email/email_reset_password_api",
                 'token' => $token,
                 'general_settings' => $this->api_general_settings->getAll(),
-                'settings' => $this->settings_model->get_settings('2')
+                'settings' => $this->settings_model->get_settings('2'),
+                'lang_base_url' => base_url()
             );
 
             $this->send_email($data);

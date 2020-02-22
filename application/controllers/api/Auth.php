@@ -53,7 +53,7 @@ class Auth extends REST_Controller{
 			$this->return['message'] = "Kami tidak dapat menemukan pengguna dengan alamat email itu!";
 		}
 		
-		// $this->response($this->return);
+		$this->response($this->return);
 	}
 
 }
