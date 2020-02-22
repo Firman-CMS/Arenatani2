@@ -57,7 +57,7 @@ class Product extends REST_Controller{
 				'count_product' => $this->api_product_model->get_paginated_filtered_products_count($category->id, null, null, $getData)
 			];
 		}
-		print_r($datas2);
+
 		$data['categories'] = $cat;
 		$data['total_per_page'] = count($datas);
 
@@ -168,8 +168,7 @@ class Product extends REST_Controller{
 		} else {
 			$this->return['message'] = "No data";
 		}
-		// print_r($sumRating);
-		// print_r($data["location"]);
+		
 		$this->response($this->return);
 	}
 

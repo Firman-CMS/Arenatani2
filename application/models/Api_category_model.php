@@ -6,9 +6,7 @@ class Api_category_model extends CI_Model
     public function __construct(){
         parent::__construct();
         
-        // $this->load->model('api_general_setting');
         $this->tabela = 'categories';
-        // $this->load->helper('api_helper');
     }
 
 
