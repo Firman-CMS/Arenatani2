@@ -25,6 +25,23 @@ class Api_product_model extends CI_Model
         return $query->result();
     }
 
+    public function get_related_products($product)
+    {
+        $this->build_query();
+        if ($product->third_category_id != 0) {
+            $this->db->where('products.third_category_id', $product->third_category_id);
+        } elseif ($product->subcategory_id != 0) {
+            $this->db->where('products.subcategory_id', $product->subcategory_id);
+        } else {
+            $this->db->where('products.category_id', $product->category_id);
+        }
+        $this->db->where('products.id !=', $product->id);
+        $this->db->limit(4);
+        $this->db->order_by('products.created_at', 'DESC');
+        $query = $this->db->get('products');
+        return $query->result();
+    }
+
     public function filter_products($category_id, $subcategory_id, $third_category_id, $data)
     {
         $category_id = clean_number($category_id);

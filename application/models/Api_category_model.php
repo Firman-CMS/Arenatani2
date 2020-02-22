@@ -6,17 +6,16 @@ class Api_category_model extends CI_Model
     public function __construct(){
         parent::__construct();
         
-        // $this->load->model('api_general_setting');
         $this->tabela = 'categories';
     }
 
 
     //get parent categories
-    public function get_parent_categories($sitelang)
+    public function get_parent_categories($sitelangId)
     {
         $this->db->join('categories_lang', 'categories_lang.category_id = categories.id');
         $this->db->select('categories.*, categories_lang.lang_id as lang_id, categories_lang.name as name');
-        $this->db->where('categories_lang.lang_id', $sitelang);
+        $this->db->where('categories_lang.lang_id', $sitelangId);
         $this->db->where('category_level', 1);
         $this->db->where('categories.visibility', 1);
         $this->db->order_by('category_order');
@@ -24,9 +23,16 @@ class Api_category_model extends CI_Model
         return $query->result();
     }
 
-    public function getSiteLang()
+    public function get_category_joined($id, $sitelangId)
     {
-        return $this->api_general_settings->getValueOf('site_lang');
+        $id = clean_number($id);
+        $this->db->join('categories_lang', 'categories_lang.category_id = categories.id');
+        $this->db->select('categories.*, categories_lang.lang_id as lang_id, categories_lang.name as name');
+        $this->db->where('categories_lang.lang_id', $sitelangId);
+        $this->db->where('categories.id', $id);
+        $this->db->where('categories.visibility', 1);
+        $query = $this->db->get('categories');
+        return $query->row();
     }
 
 }
