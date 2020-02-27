@@ -29,6 +29,7 @@ class Api_user_model extends CI_Model
             'username' => $listData->username,
             'email' => $listData->email,
             'role' => $listData->role,
+            'slug' => $listData->slug,
             'logged_in' => true,
         ];
 

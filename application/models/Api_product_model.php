@@ -159,4 +159,36 @@ class Api_product_model extends CI_Model
         }
     }
 
+    public function add_remove_favorites($data)
+    {
+        $productId = clean_number($data['product_id']);
+        if ($data['user_id']) {
+            if ($this->is_product_in_favorites($data)) {
+                $this->db->where('user_id', $data['user_id']);
+                $this->db->where('product_id', $productId);
+                $this->db->delete('favorites');
+            } else {
+                $data = array(
+                    'user_id' => $data['user_id'],
+                    'product_id' => $productId
+                );
+                $this->db->insert('favorites', $data);
+            }
+        }
+    }
+
+    public function is_product_in_favorites($data)
+    {
+        $productId = clean_number($data['product_id']);
+        if ($data['user_id']) {
+            $this->db->where('user_id', $data['user_id']);
+            $this->db->where('product_id', $productId);
+            $query = $this->db->get('favorites');
+            if (!empty($query->row())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

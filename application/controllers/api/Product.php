@@ -97,6 +97,7 @@ class Product extends REST_Controller{
 		$this->comment_limit = 5;
 
 		$slug = $this->get('slug');
+		$userId = $this->get('user_id');
 		$productValue = $this->product_model->get_product_by_slug($slug);
 
 		$datas = [];
@@ -159,6 +160,10 @@ class Product extends REST_Controller{
             $data['comment_count'] = $this->comment_model->get_product_comment_count($productValue->id);
             $data['comments'] = $this->comment_model->get_comments($productValue->id, $this->comment_limit);
             $data['comment_limit'] = $this->comment_limit;
+
+            $data['is_favorite'] = $this->isfavorite($userId, $productValue->id);
+            $data['favorite_count'] = $this->product_model->get_product_favorited_count($productValue->id);
+            $data['hit_count'] = $productValue->hit;
 
             $data['location_maps'] = $this->buildLocation($productValue);
 
@@ -277,6 +282,46 @@ class Product extends REST_Controller{
     		$frame = '<iframe src="https://maps.google.com/maps?width=100%&height=600&hl=en&q='.$location .'&ie=UTF8&t=&z=8&iwloc=B&output=embed&disableDefaultUI=true" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
     	}
     	return $frame;
+    }
+
+    public function favorite_post()
+    {
+    	$data = [
+			'user_id' => $this->post('user_id'),
+			'product_id' => $this->post('product_id')
+		];
+
+		if ($this->post('user_id')) {
+
+			$this->api_product_model->add_remove_favorites($data);
+
+			$this->return['status'] = true;
+			$this->return['message'] = "Success";
+		} else {
+			$this->return['message'] = "Invalid data";
+		}
+
+		$this->response($this->return);
+    }
+
+    public function isfavorite($userId, $productId)
+    {
+    	if (!$userId) {
+    		return false;
+    	}
+
+    	$data = [
+			'user_id' => $userId,
+			'product_id' => $productId
+		];
+
+    	$isFavorite = $this->api_product_model->is_product_in_favorites($data);
+
+    	if ($isFavorite) {
+    		return true;
+    	}else{
+    		return false;
+    	}
     }
 }
 ?>
