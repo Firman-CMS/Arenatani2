@@ -13,6 +13,7 @@ class Product extends REST_Controller{
 		$this->load->model("api_category_model");
 		$this->load->model("api_file_model");
 		$this->load->model("api_general_settings");
+		$this->load->model("api_field_model");
 		$this->load->helper('api_helper');
 		$this->product_per_page = 15;
 	}
@@ -38,8 +39,11 @@ class Product extends REST_Controller{
 
 		$datas = [];
 		foreach ($products as $productValue) {
-			$dataProduct = $this->dataProduct($productValue);
-			$dataProduct['image'] = $this->image_get($productValue->id, 'image_small');
+			$dataProduct = listdataProduct($productValue);
+
+			$image = $this->api_file_model->get_image_by_product($productValue->id);
+			$dataProduct['image'] = generateImgProduct($image,'image_small');
+
 
 			$datas[] = $dataProduct;
 		}
@@ -104,7 +108,7 @@ class Product extends REST_Controller{
 		if ($productValue->id) {
 			$price = $productValue->price / 100;
 		
-			$datas = $this->dataProduct($productValue);
+			$datas = listdataProduct($productValue);
 			$data["product"] = $datas;
 
 			$productImages = $this->api_file_model->get_product_images($productValue->id);
@@ -128,8 +132,11 @@ class Product extends REST_Controller{
             $relatedProducts = $this->api_product_model->get_related_products($productValue);
             $relatedProduct_ = [];
             foreach ($relatedProducts as $relatedProduct) {
-            	$relatedList = $this->dataProduct($relatedProduct);
-            	$relatedList['image'] = $this->image_get($relatedProduct->id, 'image_small');
+            	$relatedList = listdataProduct($relatedProduct);
+
+            	$image = $this->api_file_model->get_image_by_product($relatedProduct->id);
+            	$relatedList['image'] = generateImgProduct($image,'image_small');
+            	
             	$relatedProduct_[] = $relatedList;
             }
             $data["related_products"] = $relatedProduct_;
@@ -140,8 +147,11 @@ class Product extends REST_Controller{
             $userProducts = $this->product_model->get_user_products($data["user"]['slug'], 3, $data["product"]['id']);
             $userProductList = [];
             foreach ($userProducts as $userProduct) {
-            	$userProdList = $this->dataProduct($userProduct);
-            	$userProdList['image'] = $this->image_get($userProduct->id, 'image_small');
+            	$userProdList = listdataProduct($userProduct);
+            	
+            	$image = $this->api_file_model->get_image_by_product($userProduct->id);
+            	$userProdList['image'] = generateImgProduct($image,'image_small');
+            	
             	$userProductList[] = $userProdList;
             }
             $data["user_products"] = $userProductList;
@@ -167,6 +177,10 @@ class Product extends REST_Controller{
 
             $data['location_maps'] = $this->buildLocation($productValue);
 
+            $customFields = $this->api_field_model->generate_custom_fields_array($productValue->category_id, $productValue->subcategory_id, $productValue->third_category_id, $productValue->id, $sitelang);
+            $data["product"]["unit"] = getCustomFieldValue($customFields[0], $sitelang);
+            $data["product"]["address_detail"] = getLocation($productValue);
+
 			$this->return['status'] = true;
 			$this->return['message'] = "Success";
 			$this->return['data'] = $data;
@@ -175,62 +189,6 @@ class Product extends REST_Controller{
 		}
 		
 		$this->response($this->return);
-	}
-
-	public function dataProduct($objProduct)
-	{
-		$datas = [
-			'id' => $objProduct->id,
-			'title' => $objProduct->title,
-			'slug' => $objProduct->slug,
-			'image' => $objProduct->image,
-			'penjual' => $objProduct->penjual,
-			'provinsi' => $objProduct->provinsi,
-			'kabupaten' => $objProduct->kabupaten,
-			'kecamatan' => $objProduct->kecamatan,
-			'hape' => $objProduct->hape,
-			'photo_profile' => $objProduct->photo_profile,
-			'product_type' => $objProduct->product_type,
-			'listing_type' => $objProduct->listing_type,
-			'category_id' => $objProduct->category_id,
-			'subcategory_id' => $objProduct->subcategory_id,
-			'third_category_id' => $objProduct->third_category_id,
-			'price' => $objProduct->price / 100,
-			'currency' => $objProduct->currency,
-			'description' => $objProduct->description,
-			'product_condition' => $objProduct->product_condition,
-			'country_id' => $objProduct->country_id,
-			'state_id' => $objProduct->state_id,
-			'city_id' => $objProduct->city_id,
-			'address' => $objProduct->address,
-			'zip_code' => $objProduct->zip_code,
-			'user_id' => $objProduct->user_id,
-			'status' => $objProduct->status,
-			'is_promoted' => $objProduct->is_promoted,
-			'promote_start_date' => $objProduct->promote_start_date,
-			'promote_end_date' => $objProduct->promote_end_date,
-			'promote_plan' => $objProduct->promote_plan,
-			'promote_day' => $objProduct->promote_day,
-			'visibility' => $objProduct->visibility,
-			'rating' => $objProduct->rating,
-			'hit' => $objProduct->hit,
-			'external_link' => $objProduct->external_link,
-			'files_included' => $objProduct->files_included,
-			'shipping_time' => $objProduct->shipping_time,
-			'shipping_cost_type' => $objProduct->shipping_cost_type,
-			'shipping_cost' => $objProduct->shipping_cost,
-			'is_sold' => $objProduct->is_sold,
-			'is_deleted' => $objProduct->is_deleted,
-			'is_draft' => $objProduct->is_draft,
-			'created_at' => $objProduct->created_at,
-			'user_username' => $objProduct->user_username,
-			'shop_name' => $objProduct->shop_name,
-			'user_role' => $objProduct->user_role,
-			'user_slug' => $objProduct->user_slug,
-			'product_url' => base_url().'/'.$objProduct->slug,
-		];
-
-		return $datas;
 	}
 
 	public function get_location($object)
