@@ -25,3 +25,7 @@ $lang["confirm_your_email"] = "Konfirmasikan Email Anda";
 $lang["msg_confirmation_email"] = "Silakan klik tombol di bawah untuk mengkonfirmasi email Anda.";
 $lang["reset_password"] = "Setel Ulang Kata Sandi";
 $lang["email_reset_password"] = "Silakan klik tombol di bawah ini untuk mengatur ulang kata sandi Anda.";
+$lang["1_business_day"] = "Siap dikirim dalam 1 Hari Kerja";
+$lang["2_3_business_days"] = "Siap kirim dalam 2-3 Hari Kerja";
+$lang["4_7_business_days"] = "Siap dikirim dalam 4-7 Hari Kerja";
+$lang["8_15_business_days"] = "Siap dikirim dalam 8-15 Hari Kerja";
