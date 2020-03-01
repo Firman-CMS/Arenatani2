@@ -55,7 +55,9 @@ class Profile extends REST_Controller{
 				$data['count_drafts'] = get_user_drafts_count($user->id);
 			}
 
-			$data['is_follow'] = is_user_follows($user->id, $userLogin_->id);
+			if ($userLogin != $userSlug) {
+				$data['is_follow'] = is_user_follows($user->id, $userLogin_->id);
+			}
 
 			$this->return['status'] = true;
 			$this->return['message'] = "Success";
