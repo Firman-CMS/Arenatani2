@@ -29,6 +29,7 @@ class Profile extends REST_Controller{
 			$data['user']->avatar = getAvatar($user);
 			$data['user']->aktif = timeAgo($user->last_seen);
 			$data['user']->member_since = helper_date_format($user->created_at);
+			$data['user']->shop_name = $user->shop_name ?: $user->username;
 
 			$products = $this->product_model->get_paginated_user_products($user->slug, $perPage, $offset);
 			$datas = [];
@@ -69,9 +70,9 @@ class Profile extends REST_Controller{
         $this->response($this->return);
 	}
 
-	public function listfavorite_post()
+	public function listfavorite_get()
     {
-    	$userSlug = $this->post('user_slug');
+    	$userSlug = $this->get('user_slug');
     	$slug = decode_slug($userSlug);
         $user = $this->auth_model->get_user_by_slug($slug);
 
@@ -95,6 +96,72 @@ class Profile extends REST_Controller{
         	$this->return['status'] = true;
 			$this->return['message'] = "Success";
 			$this->return['data'] = $data;
+        }
+
+        $this->response($this->return);
+    }
+
+    public function follower_get()
+    {
+    	$userSlug = $this->get('user_slug');
+    	$slug = decode_slug($userSlug);
+        $user = $this->auth_model->get_user_by_slug($slug);
+
+        if (empty($user)) {
+            $this->return['message'] = "User not found";
+        }else {
+        	$follower = $this->profile_model->get_followers($user->id);
+
+        	if ($follower) {
+        		$followers = [];
+        		foreach ($follower as $user) {
+        			$followerList = userDataList($user);
+        			$followerList['avatar'] = getAvatar($user);
+
+        			$followers[] = $followerList;
+        		}
+
+        		$this->return['status'] = true;
+        		$this->return['message'] = "Success";
+        		$this->return['data'] = $followers;
+        	}else{
+        		$this->return['status'] = true;
+        		$this->return['message'] = "Success";
+        		$this->return['data'] = [];
+        	}
+        }
+
+        $this->response($this->return);
+    }
+
+    public function following_get()
+    {
+    	$userSlug = $this->get('user_slug');
+    	$slug = decode_slug($userSlug);
+        $user = $this->auth_model->get_user_by_slug($slug);
+
+        if (empty($user)) {
+            $this->return['message'] = "User not found";
+        }else {
+        	$following = $this->profile_model->get_following_users($user->id);
+
+        	if ($following) {
+        		$followings = [];
+        		foreach ($following as $user) {
+        			$followingList = userDataList($user);
+        			$followingList['avatar'] = getAvatar($user);
+
+        			$followings[] = $followingList;
+        		}
+
+        		$this->return['status'] = true;
+        		$this->return['message'] = "Success";
+        		$this->return['data'] = $followings;
+        	}else{
+        		$this->return['status'] = true;
+        		$this->return['message'] = "Success";
+        		$this->return['data'] = [];
+        	}
         }
 
         $this->response($this->return);

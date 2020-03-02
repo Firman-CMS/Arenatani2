@@ -208,3 +208,15 @@ function timeAgo($timestamp)
         }
     }
 }
+
+function userDataList($userObj)
+{
+	$data = [
+		'id' => $userObj->id,
+		'username' => $userObj->username,
+		'slug' => $userObj->slug,
+		'shop_name' => $userObj->shop_name ?: $userObj->username,
+	];
+
+	return $data;
+}

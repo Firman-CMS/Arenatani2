@@ -17,6 +17,8 @@ class Product extends REST_Controller{
 		$this->load->helper('api_helper');
 		$this->load->helper('custom_helper');
 		$this->product_per_page = 15;
+		error_reporting(0);
+		ini_set('display_errors', 0);
 	}
 
 	public function index_get(){
