@@ -155,7 +155,7 @@ function getAvatar($user)
 	if (!empty($user->avatar) && file_exists(FCPATH . $user->avatar)) {
 	    return base_url() . $user->avatar;
 	} elseif (!empty($user->avatar) && $user->user_type != "registered") {
-	    return $user->avatar;
+	    return base_url() . $user->avatar;
 	} else {
 	    return base_url() . "assets/img/user.png";
 	}
@@ -164,7 +164,8 @@ function getAvatar($user)
 function timeAgo($timestamp)
 {
     $time_ago = strtotime($timestamp);
-    $current_time = strtotime('-12 hour',time());
+    // $current_time = strtotime('-12 hour',time());
+    $current_time = time();
     $time_difference = $current_time - $time_ago;
     $seconds = $time_difference;
     $minutes = round($seconds / 60);           // value 60 is seconds

@@ -15,6 +15,7 @@ class Product extends REST_Controller{
 		$this->load->model("api_general_settings");
 		$this->load->model("api_field_model");
 		$this->load->helper('api_helper');
+		$this->load->helper('custom_helper');
 		$this->product_per_page = 15;
 	}
 
@@ -110,6 +111,7 @@ class Product extends REST_Controller{
 		
 			$datas = listdataProduct($productValue);
 			$data["product"] = $datas;
+			$data["product"]["uploaded"] = timeAgo($productValue->created_at);
 
 			$productImages = $this->api_file_model->get_product_images($productValue->id);
 			$img = [];
@@ -141,10 +143,14 @@ class Product extends REST_Controller{
             }
             $data["related_products"] = $relatedProduct_;
 
-            $data["user"] = (array) $this->auth_model->get_user($productValue->user_id);
-            $data["user"]["avatar"] = $data["user"]["avatar"] ? base_url().$data["user"]["avatar"] : '';
+            $data["user"] = $this->auth_model->get_user($productValue->user_id);
+            $data["user"]->avatar = getAvatar($data["user"]);
+            $data["user"]->aktif = timeAgo($data["user"]->last_seen);
+            if ($userId != $data["user"]->id) {
+				$data["user"]->is_follow = is_user_follows($data["user"]->id, $userId);
+			}
             
-            $userProducts = $this->product_model->get_user_products($data["user"]['slug'], 3, $data["product"]['id']);
+            $userProducts = $this->product_model->get_user_products($data["user"]->slug, 3, $data["product"]['id']);
             $userProductList = [];
             foreach ($userProducts as $userProduct) {
             	$userProdList = listdataProduct($userProduct);
@@ -178,8 +184,10 @@ class Product extends REST_Controller{
             $data['location_maps'] = $this->buildLocation($productValue);
 
             $customFields = $this->api_field_model->generate_custom_fields_array($productValue->category_id, $productValue->subcategory_id, $productValue->third_category_id, $productValue->id, $sitelang);
+            
             $data["product"]["unit"] = getCustomFieldValue($customFields[0], $sitelang);
             $data["product"]["address_detail"] = getLocation($productValue);
+            $data["product"]["product_condition"] = get_product_condition_by_key($productValue->product_condition, $sitelang);
 
 			$this->return['status'] = true;
 			$this->return['message'] = "Success";
