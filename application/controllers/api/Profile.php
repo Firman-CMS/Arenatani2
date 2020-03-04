@@ -12,6 +12,8 @@ class Profile extends REST_Controller{
 		$this->load->model("api_file_model");
 		$this->load->helper('api_helper');
 		$this->load->helper('custom_helper');
+		error_reporting(0);
+		ini_set('display_errors', 0);
 	}
 
 	public function index_get()
@@ -30,18 +32,8 @@ class Profile extends REST_Controller{
 			$data['user']->aktif = timeAgo($user->last_seen);
 			$data['user']->member_since = helper_date_format($user->created_at);
 			$data['user']->shop_name = $user->shop_name ?: $user->username;
-
-			$products = $this->product_model->get_paginated_user_products($user->slug, $perPage, $offset);
-			$datas = [];
-			foreach ($products as $productValue) {
-				$dataProduct = listdataProduct($productValue);
-
-				$image = $this->api_file_model->get_image_by_product($productValue->id);
-				$dataProduct['image'] = generateImgProduct($image,'image_small');
-
-				$datas[] = $dataProduct;
-			}
-			$data['product'] = $datas;
+			$data['user']->seller_rating = 'Member';
+			$data['user']->address = get_location($user);
 
 			$data['count_product'] = count($datas);
 			$data['count_favorite'] = get_user_favorited_products_count($user->id);
@@ -66,6 +58,36 @@ class Profile extends REST_Controller{
 		}else{
 			$this->return['message'] = "User not found";
 		}
+
+        $this->response($this->return);
+	}
+
+	public function listproduct_get()
+	{
+		$userSlug = $this->get('user_slug');
+    	$slug = decode_slug($userSlug);
+        $user = $this->auth_model->get_user_by_slug($slug);
+
+        if (empty($user)) {
+            $this->return['message'] = "User not found";
+        }else {
+        	$products = $this->product_model->get_paginated_user_products($user->slug, $perPage, $offset);
+        	$datas = [];
+			foreach ($products as $productValue) {
+				$dataProduct = listdataProduct($productValue);
+
+				$image = $this->api_file_model->get_image_by_product($productValue->id);
+				$dataProduct['image'] = generateImgProduct($image,'image_small');
+
+				$datas[] = $dataProduct;
+			}
+
+			$data['product'] = $datas;
+
+			$this->return['status'] = true;
+			$this->return['message'] = "Success";
+			$this->return['data'] = $data;
+        }
 
         $this->response($this->return);
 	}

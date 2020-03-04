@@ -9,9 +9,7 @@ class Messages extends REST_Controller{
 		parent::__construct();
 		$this->return = array('status' => false, 'message' => 'Something wrong');
 
-		// $this->load->model("api_auth_model");
 		$this->load->model("api_messages_model");
-		// $this->load->helper('custom_helper');
 		$this->load->helper('api_helper');
 	}
 
