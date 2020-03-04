@@ -13,12 +13,26 @@ class Messages extends REST_Controller{
 		$this->load->helper('api_helper');
 	}
 
-	public function send_post(){
+	public function addnew_post(){
 		$post = [
-			'email' => $this->post('email'),
-			'password' => $this->post('password'),
-			'username' => remove_special_characters($this->post('username')),
+			'user_id' => $this->post('user_id'),
+			'receiver_id' => $this->post('receiver_id'),
+			'subject' => $this->post('subject'),
+			'created_at' => date("Y-m-d H:i:s")
 		];
+
+		$conversation_id = $this->api_messages_model->add_conversation($post);
+		if ($conversation_id) {
+			$post['body_message'] = $this->post('body_message');
+			$post['id_message'] = $conversation_id;
+
+			if ($this->api_messages_model->add_message($post)) {
+                $this->return['status'] = true;
+				$this->return['message'] = "Success";
+			}else{
+				$this->return['message'] = "Tidak ada pesan";
+			}
+		}
 
 		$this->response($this->return);
 	}
@@ -149,11 +163,14 @@ class Messages extends REST_Controller{
 
 	public function delconversation_post()
     {
-        $conversation_id = $this->post('id_message');
-        if ($this->message_model->delete_conversation($conversation_id)) {
+        $messageId = $this->post('id_message');
+        $userId = $this->post('user_id');
+        if ($this->api_messages_model->delete_conversation($messageId, $userId)){
         	$this->return['status'] = true;
-			$this->return['message'] = "Success";
+        	$this->return['message'] = "Success";
         }
+
+        $this->response($this->return);
         
     }
 }
