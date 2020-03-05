@@ -10,6 +10,7 @@ class Profile extends REST_Controller{
 		
 		$this->return = array('status' => false, 'message' => 'Something wrong', 'data' => []);
 		$this->load->model("api_file_model");
+		$this->load->model("api_profile_model");
 		$this->load->helper('api_helper');
 		$this->load->helper('custom_helper');
 		error_reporting(0);
@@ -187,6 +188,26 @@ class Profile extends REST_Controller{
         }
 
         $this->response($this->return);
+    }
+
+    public function followunfollow_post()
+    {
+    	$data = [
+    		'follower_id' => $this->post('user_id'),
+    		'following_id' => $this->post('following_id')
+    	];
+
+    	if ($this->post('user_id') && $this->post('following_id')) {
+
+    		$this->api_profile_model->follow_unfollow_user($data);
+
+    		$this->return['status'] = true;
+    		$this->return['message'] = "Success";
+    	} else {
+    		$this->return['message'] = "Invalid data";
+    	}
+
+    	$this->response($this->return);
     }
 
 }
