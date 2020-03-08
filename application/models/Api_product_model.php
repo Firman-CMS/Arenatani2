@@ -317,6 +317,39 @@ class Api_product_model extends CI_Model
         return $this->db->update('products', $data);
     }
 
+    //edit product
+    public function edit_product($post)
+    {
+        $id = clean_number($post['product_id']);
+        $data = array(
+            'title' => $post['title'],
+            'product_type' => 'physical',
+            'listing_type' => 'ordinary_listing',
+            'category_id' => $post['category_id'],
+            'subcategory_id' => "",
+            'third_category_id' => "",
+            'description' => $post['description']
+        );
+        $data["slug"] = str_slug($data["title"]);
+        if (empty($data["subcategory_id"])) {
+            $data["subcategory_id"] = 0;
+        }
+        if (empty($data["third_category_id"])) {
+            $data["third_category_id"] = 0;
+        }
+        $is_sold = $post['status_sold'];
+        if ($is_sold == "active") {
+            $data["is_sold"] = 0;
+        } elseif ($is_sold == "sold") {
+            $data["is_sold"] = 1;
+        }
+        if (is_admin()) {
+            $data["visibility"] = $this->input->post('visibility', true);
+        }
+        $this->db->where('id', $id);
+        return $this->db->update('products', $data);
+    }
+
     //save as draft
     public function saveasdraft($post)
     {

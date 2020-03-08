@@ -36,14 +36,11 @@ class Sell extends REST_Controller{
 			if ($uploadProduct) {
 				if ($_FILES) {
 					$productId = $uploadProduct;
-					if ($this->uploadImg($productId)) {
-						$this->return['message'] = "Success";
-					}else{
-						$this->return['message'] = "Image gagal diupload";
-					}
+					$this->uploadImg($productId);
 				}
 
 				$this->return['status'] = true;
+				$this->return['message'] = "Success";
 				$this->return['data'] = $uploadProduct;
 			}else{
 				return $this->response($this->return);
@@ -138,7 +135,24 @@ class Sell extends REST_Controller{
 
 	public function drafedit_post()
 	{
-		# code...
+		$post = [
+			'user_id' => $this->post('user_id'),
+			'product_id' => $this->post('product_id'),
+			'title' => $this->post('title'),
+			'category_id' => $this->post('category_id'),
+			'description' => $this->post('description')
+		];
+
+		foreach ($post as $dataPost) {
+			if (!$dataPost) {
+				$this->return['message'] = "Data tidak lengkap";
+				return $this->response($this->return);
+			}
+		}
+
+		$post['status_sold'] = $this->post('status_sold');
+
+		$this->postEditStep1($post);
 	}
 
 
@@ -154,6 +168,8 @@ class Sell extends REST_Controller{
 		if (!$product || ($get['user_id'] != $product->user_id)) {
 			return $this->response($this->return);
 		}
+
+		$product->is_sold_value = $product->is_sold == 0 ? 'active' : 'sold';
 
 		$data['product'] = $product;
 
@@ -208,6 +224,7 @@ class Sell extends REST_Controller{
 
 		$customFields = $this->api_field_model->generate_custom_fields_array($product->category_id, $product->subcategory_id, $product->third_category_id, $product->id, $sitelang);
 		$data["product"]->unit = getCustomFieldValue2($customFields[0], $sitelang);
+		$data["set_to_draft"] = $product->is_draft == 1 ? true : false;
 
 		$this->return['status'] = true;
 		$this->return['message'] = "Success";
@@ -216,9 +233,34 @@ class Sell extends REST_Controller{
 		return $this->response($this->return);
 	}
 
+	public function postEditStep1($post)
+	{
+		$product = $this->product_admin_model->get_product($post['product_id']);
+
+		if (!$product || ($post['user_id'] != $product->user_id)) {
+			return $this->response($this->return);
+		}
+
+		if ($this->api_product_model->edit_product($post)) {
+            //edit slug
+            $this->product_model->update_slug($post['product_id']);
+
+            if ($_FILES) {
+				$productId = $post['product_id'];
+				$this->uploadImg($productId);
+			}
+
+			$this->return['status'] = true;
+			$this->return['message'] = "Success";
+			$this->return['data'] = $productId;
+        }
+
+		$this->response($this->return);
+	}
+
 	public function editproduct_post()
 	{
-		# code...
+		$this->drafedit_post();
 	}
 
 	public function deleteimg_post()
@@ -235,7 +277,6 @@ class Sell extends REST_Controller{
 	public function uploadImg($productId)
 	{
 		$count = count($_FILES['files']['name']);
-
 		for($i=0;$i<$count;$i++){
 			if(!empty($_FILES['files']['name'][$i])){
 				$_FILES['file']['name'] = $_FILES['files']['name'][$i];
@@ -259,9 +300,6 @@ class Sell extends REST_Controller{
 
 					$this->api_upload_model->delete_temp_image($temp_path);
 
-					return true;
-				}else{
-					return false;
 				}
 
 			}
