@@ -62,7 +62,7 @@ function listdataProduct($objProduct)
 		'is_draft' => $objProduct->is_draft,
 		'created_at' => $objProduct->created_at,
 		'user_username' => $objProduct->user_username,
-		'shop_name' => $objProduct->shop_name,
+		'shop_name' => $objProduct->shop_name ?: $objProduct->user_username,
 		'user_role' => $objProduct->user_role,
 		'user_slug' => $objProduct->user_slug,
 		'product_url' => base_url().$objProduct->slug,
@@ -100,6 +100,30 @@ function getCustomFieldValue($custom_field, $selected_lang)
                         $str = $field_option->field_option;
                     } else {
                         $str .= ", " . $field_option->field_option;
+                    }
+                }
+            }
+        }
+    }
+    return $str;
+}
+
+function getCustomFieldValue2($custom_field, $selected_lang)
+{
+    $str = "";
+    if (!empty($custom_field)) {
+        if (!empty($custom_field->field_value)) {
+            $str = html_escape($custom_field->field_value);
+        } elseif (!empty($custom_field->field_common_ids)) {
+            foreach ($custom_field->field_common_ids as $item) {
+                $field_option = getFieldOptionByLang($item, $selected_lang);
+                if (!empty($field_option)) {
+                    if (empty($str)) {
+                        $str['unit'] = $field_option->field_option;
+                        $str['code'] = $field_option->common_id;
+                    } else {
+                        $str['unit'] .= ", " . $field_option->field_option;
+                        $str['code'] .= ", " . $field_option->common_id;
                     }
                 }
             }
@@ -219,4 +243,13 @@ function userDataList($userObj)
 	];
 
 	return $data;
+}
+
+function getProductImageUrl($image, $size)
+{
+    if ($image) {
+        return base_url() . "uploads/images/" . $image->$size;
+    } else {
+        return base_url() . 'assets/img/no-image.jpg';
+    }
 }
