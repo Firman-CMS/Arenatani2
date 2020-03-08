@@ -36,7 +36,7 @@ class Profile extends REST_Controller{
 			$data['user']->seller_rating = 'Member';
 			$data['user']->address = get_location($user);
 
-			$data['count_product'] = count($datas);
+			$data['count_product'] = get_user_products_count($user->slug);
 			$data['count_favorite'] = get_user_favorited_products_count($user->id);
 			$data['count_followers'] = get_followers_count($user->id);
 			$data['count_following'] = get_following_users_count($user->id);
