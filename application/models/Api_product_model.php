@@ -494,4 +494,34 @@ class Api_product_model extends CI_Model
         }
     }
 
+    public function set_product_as_sold($product_id)
+    {
+        $product_id = clean_number($product_id);
+        $product = $this->get_product_by_id($product_id);
+        if (!empty($product)) {
+            if ($product->is_sold == 1) {
+                $data = array(
+                    'is_sold' => 0
+                );
+            } else {
+                $data = array(
+                    'is_sold' => 1
+                );
+            }
+            $this->db->where('id', $product_id);
+            return $this->db->update('products', $data);
+        }
+        return false;
+    }
+
+    public function delete_product($product_id)
+    {
+        $product_id = clean_number($product_id);
+        $data = array(
+            'is_deleted' => 1
+        );
+        $this->db->where('id', $product_id);
+        return $this->db->update('products', $data);
+    }
+
 }
