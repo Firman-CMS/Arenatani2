@@ -291,5 +291,58 @@ class Product extends REST_Controller{
     		return false;
     	}
     }
+
+    public function setproductsold_post()
+    {
+        $product_id = $this->post('product_id');
+        $userId = $this->post('user_id');
+
+        $product = $this->product_admin_model->get_product($product_id);
+
+        if (!$product) {
+        	return $this->response($this->return);
+        }
+
+        if ($product->user_id != $userId || $product->is_draft == 1) {
+        	return $this->response($this->return);
+        }
+
+        $this->api_product_model->set_product_as_sold($product_id);
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        unset($this->return['data']);
+
+        $this->response($this->return);
+    }
+
+    public function delproduct_post()
+    {
+    	$product_id = $this->post('product_id');
+    	$userId = $this->post('user_id');
+
+    	$product = $this->api_product_model->get_product_by_id($product_id);
+
+    	if (!$product) {
+    		return $this->response($this->return);
+    	}
+
+    	if ($product->user_id != $userId) {
+    		return $this->response($this->return);
+    	}
+
+    	if ($product->is_deleted == 1) {
+    		$this->return['message'] = "Telah dihapus";
+    		return $this->response($this->return);
+    	}
+
+    	$this->api_product_model->delete_product($product_id);
+
+    	$this->return['status'] = true;
+    	$this->return['message'] = "Success";
+    	unset($this->return['data']);
+
+    	$this->response($this->return);
+    }
 }
 ?>

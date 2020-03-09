@@ -120,7 +120,8 @@ class Sell extends REST_Controller{
 				'product_id' => $productImg->product_id,
 				'image_default' => getProductImageUrl($productImg, 'image_default'),
 				'image_big' => getProductImageUrl($productImg, 'image_big'),
-				'image_small' => getProductImageUrl($productImg, 'image_small')
+				'image_small' => getProductImageUrl($productImg, 'image_small'),
+				'is_main' => $productImg->is_main
 			];
 		}
 		$data["product_images"] = $img;
@@ -181,7 +182,8 @@ class Sell extends REST_Controller{
 				'product_id' => $productImg->product_id,
 				'image_default' => getProductImageUrl($productImg, 'image_default'),
 				'image_big' => getProductImageUrl($productImg, 'image_big'),
-				'image_small' => getProductImageUrl($productImg, 'image_small')
+				'image_small' => getProductImageUrl($productImg, 'image_small'),
+				'is_main' => $productImg->is_main
 			];
 		}
 		$data["product_images"] = $img;
@@ -216,7 +218,8 @@ class Sell extends REST_Controller{
 				'product_id' => $productImg->product_id,
 				'image_default' => getProductImageUrl($productImg, 'image_default'),
 				'image_big' => getProductImageUrl($productImg, 'image_big'),
-				'image_small' => getProductImageUrl($productImg, 'image_small')
+				'image_small' => getProductImageUrl($productImg, 'image_small'),
+				'is_main' => $productImg->is_main
 			];
 		}
 
@@ -265,13 +268,35 @@ class Sell extends REST_Controller{
 
 	public function deleteimg_post()
 	{
-		# code...
+		$image_id = $this->input->post('image_id', true);
+
+		$image = $this->file_model->get_image($image_id);
+		if ($image) {
+			$this->file_model->delete_product_image($image_id);
+
+			$this->return['status'] = true;
+			$this->return['message'] = "Success";
+			unset($this->return['data']);
+		}
+
+		$this->response($this->return);
 	}
 
 	//set main image product
-	public function setimage()
+	public function setimage_post()
 	{
-		# code...
+		$image_id = $this->post('image_id');
+		$product_id = $this->post('product_id');
+		$image = $this->file_model->get_image($image_id);
+
+		if ($image) {
+			$this->file_model->set_image_main($image_id, $product_id);
+			$this->return['status'] = true;
+			$this->return['message'] = "Success";
+			unset($this->return['data']);
+		}
+
+		$this->response($this->return);
 	}
 
 	public function uploadImg($productId)
