@@ -61,7 +61,7 @@ function listdataProduct($objProduct)
 		'is_deleted' => $objProduct->is_deleted,
 		'is_draft' => $objProduct->is_draft,
 		'created_at' => $objProduct->created_at,
-		'user_username' => $objProduct->user_username,
+		'user_username' => $objProduct->user_username ?: '',
 		'shop_name' => $objProduct->shop_name ?: $objProduct->user_username,
 		'user_role' => $objProduct->user_role,
 		'user_slug' => $objProduct->user_slug,

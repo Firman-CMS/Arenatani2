@@ -6,15 +6,17 @@ require APPPATH . 'libraries/REST_Controller.php';
 class Profile extends REST_Controller{
 
 	public function __construct(){
-		parent::__construct();
+        parent::__construct();
 		
-		$this->return = array('status' => false, 'message' => 'Something wrong', 'data' => []);
-		$this->load->model("api_file_model");
-		$this->load->model("api_profile_model");
-		$this->load->helper('api_helper');
-		$this->load->helper('custom_helper');
-		error_reporting(0);
-		ini_set('display_errors', 0);
+        $this->return = array('status' => false, 'message' => 'Something wrong', 'data' => []);
+        $this->load->model("api_file_model");
+        $this->load->model("api_profile_model");
+        $this->load->model("api_review_model");
+        $this->load->helper('api_helper');
+        $this->load->helper('custom_helper');
+        $this->product_per_page = 5;
+        error_reporting(0);
+        ini_set('display_errors', 0);
 	}
 
 	public function index_get()
@@ -40,12 +42,11 @@ class Profile extends REST_Controller{
 			$data['count_favorite'] = get_user_favorited_products_count($user->id);
 			$data['count_followers'] = get_followers_count($user->id);
 			$data['count_following'] = get_following_users_count($user->id);
-			$data['count_review'] = get_user_review_count($user->id);
+			$data['count_review'] = $this->api_review_model->get_review_user_count($user->id);
 
 			if ($userLogin == $userSlug) {
 				$data['count_pending'] = get_user_pending_products_count($user->id);
 				$data['count_hidden'] = get_user_hidden_products_count($user->id);
-				$data['count_drafts'] = get_user_drafts_count($user->id);
 				$data['count_drafts'] = get_user_drafts_count($user->id);
 			}
 
@@ -69,6 +70,10 @@ class Profile extends REST_Controller{
     	$slug = decode_slug($userSlug);
         $user = $this->auth_model->get_user_by_slug($slug);
 
+        $page = $this->get('page') ?: '1';
+        $perPage = $this->get('per_page') ?: $this->product_per_page;
+        $offset = $perPage * ($page - 1);
+
         if (empty($user)) {
             $this->return['message'] = "User not found";
         }else {
@@ -82,7 +87,8 @@ class Profile extends REST_Controller{
 
 				$datas[] = $dataProduct;
 			}
-
+            $data['count_drafts'] = get_user_products_count($user->slug);
+            $data['total_page'] = ceil(get_user_products_count($user->slug) / $perPage);
 			$data['product'] = $datas;
 
 			$this->return['status'] = true;
@@ -208,6 +214,54 @@ class Profile extends REST_Controller{
     	}
 
     	$this->response($this->return);
+    }
+
+    public function draft_get($value='')
+    {
+        $page = $this->get('page') ?: '1';
+        $perPage = $this->get('per_page') ?: $this->product_per_page;
+        $offset = $perPage * ($page - 1);
+
+        $userSlug = $this->get('user_slug');
+        $slug = decode_slug($userSlug);
+        $user = $this->auth_model->get_user_by_slug($slug);
+
+        $data['count_drafts'] = get_user_drafts_count($user->id);
+        $data['total_page'] = ceil(get_user_drafts_count($user->id) / $perPage);
+        $data['products'] = $this->product_model->get_paginated_user_drafts($user->id, $perPage, $offset);
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $data;
+
+        $this->response($this->return);
+    }
+
+    public function review_get()
+    {
+        $userSlug = $this->get('user_slug');
+        $slug = decode_slug($userSlug);
+        $user = $this->auth_model->get_user_by_slug($slug);
+
+        $listProduct = $this->api_review_model->get_reviews_user($user->id);
+        $reviewProducts = [];
+        if ($listProduct) {
+            foreach ($listProduct as $products) {
+                $product = $this->product_model->get_products_by_product_id($products->product_id);
+                // print_r($product);
+                $reviewProduct = listdataProduct($product);
+                $image = $this->api_file_model->get_image_by_product($product->id);
+                $reviewProduct['image'] = generateImgProduct($image, 'image_small');
+                $reviewProducts[] = $reviewProduct;
+            }
+        }
+        $data['products'] = $reviewProducts;
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $data;
+
+        $this->response($this->return);
     }
 
 }
