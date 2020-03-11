@@ -16,8 +16,9 @@ class Sell extends REST_Controller{
 		$this->load->model("api_field_model");
 		$this->load->helper('api_helper');
 		$this->load->helper('custom_helper');
-		// $this->load->model("general_settings");
 		$this->return = array('status' => false, 'message' => 'Something wrong', 'data' => []);
+		error_reporting(0);
+		ini_set('display_errors', 0);
 	}
 
 	public function index_post()
