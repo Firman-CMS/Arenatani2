@@ -40,3 +40,7 @@ $lang["month_ago"] = "sebulan yang lalu";
 $lang["months_ago"] = "bulan lalu";
 $lang["year_ago"] = "tahun lalu";
 $lang["years_ago"] = "bertahun-tahun lalu";
+$lang["1_business_day"] = "Siap dikirim dalam 1 Hari Kerja";
+$lang["2_3_business_days"] = "Siap kirim dalam 2-3 Hari Kerja";
+$lang["4_7_business_days"] = "Siap dikirim dalam 4-7 Hari Kerja";
+$lang["8_15_business_days"] = "Siap dikirim dalam 8-15 Hari Kerja";

@@ -166,7 +166,18 @@ class Product extends REST_Controller{
             $data["user_products"] = $userProductList;
 
             $data['review_count'] = $this->review_model->get_review_count($productValue->id);
-            $data['reviews'] = $this->review_model->get_limited_reviews($productValue->id, $this->review_limit);
+            
+            $reviews = $this->review_model->get_limited_reviews($productValue->id, $this->review_limit);
+            $dataReview = [];
+            foreach ($reviews as $listReview) {
+                $listReview->date =timeAgo($listReview->created_at);
+                $user = $this->auth_model->get_user($listReview->user_id);
+                $listReview->shop_name = $user->shop_name ?: $user->username;
+                $listReview->avatar = getAvatar($user);
+
+                $dataReview[] = $listReview;
+            }
+            $data['reviews'] = $dataReview;
             $data['review_limit'] = $this->review_limit;
             $sumRating = 0;
             if ($data['review_count']) {
@@ -177,7 +188,29 @@ class Product extends REST_Controller{
             }
 
             $data['comment_count'] = $this->comment_model->get_product_comment_count($productValue->id);
-            $data['comments'] = $this->comment_model->get_comments($productValue->id, $this->comment_limit);
+            $comments = $this->comment_model->get_comments($productValue->id, $this->comment_limit);
+            $dataComment = [];
+            foreach ($comments as $listComments) {
+                $listComments->date =timeAgo($listComments->created_at);
+                $user = $this->auth_model->get_user($listComments->user_id);
+                $listComments->shop_name = $user->shop_name ?: $user->username;
+                $listComments->avatar = getAvatar($user);
+
+                $subcomments = get_subcomments($listComments->id);
+                $dataSubcomments = [];
+                foreach ($subcomments as $listSubcomments) {
+                    $listSubcomments->date =timeAgo($listSubcomments->created_at);
+                    $user = $this->auth_model->get_user($listSubcomments->user_id);
+                    $listSubcomments->shop_name = $user->shop_name ?: $user->username;
+                    $listSubcomments->avatar = getAvatar($user);
+
+                    $dataSubcomments[] = $listSubcomments;
+                }
+                $listComments->sub_comment = $dataSubcomments;
+                
+                $dataComment[] = $listComments;
+            }
+            $data['comments'] = $dataComment;
             $data['comment_limit'] = $this->comment_limit;
 
             $data['is_favorite'] = $this->isfavorite($userId, $productValue->id);
@@ -409,6 +442,130 @@ class Product extends REST_Controller{
 
         $this->response($this->return);
 
+    }
+
+    public function addcomment_post()
+    {
+        # code...
+    }
+
+    public function getcondition_get()
+    {
+        $product_conditions = get_active_product_conditions(api_lang_helper()->id);
+        $productCondition[] = ['value' => '', 'label' => 'Pilih satu opsi'];
+        foreach ($product_conditions as $value) {
+            $data = [
+                'value' => $value->option_key,
+                'label' => $value->option_label,
+            ];
+
+            array_push($productCondition, $data);
+        }
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $productCondition;
+
+        $this->response($this->return);
+    }
+
+    public function getsatuan_get()
+    {
+        $satuan = $this->api_field_model->get_field_options('2',api_lang_helper()->id);
+        $satuanOptions[] = ['value' => '', 'label' => 'Pilih satu opsi'];
+        foreach ($satuan as $options) {
+            $data = [
+                'value' => $options->common_id,
+                'label' => $options->field_option,
+            ];
+
+            array_push($satuanOptions, $data);
+        }
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $satuanOptions;
+
+        $this->response($this->return);
+    }
+
+    public function getshippingtype_get()
+    {
+        $shippingType[0] = ['value' => '', 'label' => 'Pilih satu opsi'];
+        $shippingType[1] = ['value' => 'COD', 'label' => 'COD'];
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $shippingType;
+
+        $this->response($this->return);
+    }
+
+    public function getshippingtime_get()
+    {
+        $shippingTime[0] = ['value' => '', 'label' => 'Pilih satu opsi'];
+        $shippingTime[1] = ['value' => '1_business_day', 'label' => trans("1_business_day")];
+        $shippingTime[2] = ['value' => '2_3_business_days', 'label' => trans("2_3_business_days")];
+        $shippingTime[3] = ['value' => '4_7_business_days', 'label' => trans("4_7_business_days")];
+        $shippingTime[4] = ['value' => '8_15_business_days', 'label' => trans("8_15_business_days")];
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $shippingTime;
+
+        $this->response($this->return);
+    }
+
+    public function getcountry_get()
+    {
+        $country[] = ['value' => '102', 'label' => 'Indonesia'];
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $country;
+
+        $this->response($this->return);
+    }
+
+    public function getstate_get()
+    {
+        $states[] = ['value' => '', 'label' => 'Provinsi'];
+        $state = $this->location_model->get_states_by_country('102');
+
+        foreach ($state as $options) {
+            $data = [
+                'value' => $options->id,
+                'label' => $options->name,
+            ];
+
+            array_push($states, $data);
+        }
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $states;
+
+        $this->response($this->return);
+    }
+
+    public function getcity_get()
+    {
+        $stateId = $this->get('state_id');
+
+        $city = $this->location_model->get_cities_by_state($stateId);
+        $cities[] = ['value' => '', 'label' => 'Kota'];
+        foreach ($city as $options) {
+            $data = [
+                'value' => $options->id,
+                'label' => $options->name,
+            ];
+
+            array_push($cities, $data);
+        }
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        $this->return['data'] = $cities;
+
+        $this->response($this->return);
     }
 }
 ?>
