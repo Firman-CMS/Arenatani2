@@ -30,6 +30,13 @@ class Sell extends REST_Controller{
 			'description' => $this->post('description')
 		];
 
+		$user = $this->auth_model->get_user($this->get('user_id'));
+
+		if (!$user->country_id || !$user->state_id || !$user->city_id) {
+			$this->return['message'] = "Lengkapi data!, ke menu Setting->Informasi kontak";
+			return $this->response($this->return);
+		}
+
 		if($post['user_id'] && $post['title'] && $post['category_id'] && $post['description']){
 
 			$uploadProduct = $this->api_product_model->add_product($post);
@@ -87,6 +94,49 @@ class Sell extends REST_Controller{
 		}
 
 		if ($this->api_product_model->edit_product_details($post)) {
+            //edit custom fields
+            $this->api_product_model->update_product_custom_fields($post);
+
+            $this->return['status'] = true;
+            $this->return['message'] = "Success";
+            unset($this->return['data']);
+        }
+
+		return $this->response($this->return);
+	}
+
+	public function savetodraft_post()
+	{
+		$post = [
+			'user_id' => $this->post('user_id'),
+			'product_id' => $this->post('product_id'),
+			'product_condition' => $this->post('product_condition'),
+			'quantity' => $this->post('quantity'),
+			'satuan' => $this->post('satuan'),
+			'price' => $this->post('price'),
+			'shipping_cost_type' => $this->post('shipping_cost_type'),
+			'shipping_time' => $this->post('shipping_time'),
+			'country_id' => $this->post('country_id'),
+			'state_id' => $this->post('state_id'),
+		];
+
+		foreach ($post as $dataPost) {
+			if(!$dataPost){
+				$this->return['message'] = "Data tidak lengkap";
+				return $this->response($this->return);
+			}
+		}
+
+		$post['city_id'] = $this->post('city_id');
+		$post['address'] = $this->post('address');
+		$post['zip_code'] = $this->post('zip_code');
+
+		$product = $this->product_admin_model->get_product($post['product_id']);
+
+		if (!$product || ($post['user_id'] != $product->user_id)) {
+			return $this->response($this->return);
+		}
+		if ($this->api_product_model->saveasdraft($post)) {
             //edit custom fields
             $this->api_product_model->update_product_custom_fields($post);
 
@@ -208,6 +258,32 @@ class Sell extends REST_Controller{
 		if (!$product || ($get['user_id'] != $product->user_id)) {
 			return $this->response($this->return);
 		}
+
+		$user = $this->auth_model->get_user($this->get('user_id'));
+
+		if (!$user->country_id || !$user->state_id || !$user->city_id) {
+			$this->return['message'] = "Lengkapi data!, ke menu Setting->Informasi kontak";
+			return $this->response($this->return);
+		}
+
+		$countryId = $product->country_id;
+		$stateId = $product->state_id;
+		$cityId = $product->city_id;
+		$address = $product->address;
+		$zipCode = $product->zip_code;
+
+		$countryId_ = $user->country_id;
+		$stateId_ = $user->state_id;
+		$cityId_ = $user->city_id;
+		$address_ = $user->address;
+		$zipCode_ = $user->zip_code;
+
+		$product->country_id = $countryId ?: $countryId_;
+		$product->state_id = $stateId ?: $stateId_;
+		$product->city_id = $cityId ?: $cityId_;
+		$product->address = $address ?: $address_;
+		$product->zip_code = $zipCode ?: $zipCode_;
+
 
 		$data['product'] = $product;
 

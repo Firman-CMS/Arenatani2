@@ -353,10 +353,10 @@ class Api_product_model extends CI_Model
     //save as draft
     public function saveasdraft($post)
     {
-        $id = clean_number($post['id']);
+        $id = clean_number($post['product_id']);
         $product = $this->get_product_by_id($id);
         $data = array(
-            'price' => $post['id'],
+            'price' => $post['price'],
             'currency' => 'IDR',
             'product_condition' => $post['product_condition'],
             'country_id' => $post['country_id'],
