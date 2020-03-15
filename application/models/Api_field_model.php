@@ -79,4 +79,14 @@ class Api_field_model extends CI_Model
         return $query->result();
     }
 
+    //get field options
+    public function get_field_options($field_id,$lang_id)
+    {
+        $field_id = clean_number($field_id);
+        $this->db->where('lang_id', $lang_id);
+        $this->db->where('field_id', $field_id);
+        $query = $this->db->get('custom_fields_options');
+        return $query->result();
+    }
+
 }
