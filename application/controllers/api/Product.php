@@ -211,6 +211,10 @@ class Product extends REST_Controller{
                     $user = $this->auth_model->get_user($listSubcomments->user_id);
                     $listSubcomments->shop_name = $user->shop_name ?: $user->username;
                     $listSubcomments->avatar = getAvatar($user);
+                    $listSubcomments->can_delete = false;
+                    if($userId && $userId == $listSubcomments->user_id){
+                        $listSubcomments->can_delete = true;
+                    }
 
                     $dataSubcomments[] = $listSubcomments;
                 }
