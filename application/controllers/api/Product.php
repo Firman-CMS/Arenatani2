@@ -174,6 +174,10 @@ class Product extends REST_Controller{
                 $user = $this->auth_model->get_user($listReview->user_id);
                 $listReview->shop_name = $user->shop_name ?: $user->username;
                 $listReview->avatar = getAvatar($user);
+                $listReview->can_delete = false;
+                if($userId && $userId == $listReview->user_id){
+                    $listReview->can_delete = true;
+                }
 
                 $dataReview[] = $listReview;
             }
@@ -195,6 +199,10 @@ class Product extends REST_Controller{
                 $user = $this->auth_model->get_user($listComments->user_id);
                 $listComments->shop_name = $user->shop_name ?: $user->username;
                 $listComments->avatar = getAvatar($user);
+                $listComments->can_delete = false;
+                if($userId && $userId == $listComments->user_id){
+                    $listComments->can_delete = true;
+                }
 
                 $subcomments = get_subcomments($listComments->id);
                 $dataSubcomments = [];
@@ -203,6 +211,10 @@ class Product extends REST_Controller{
                     $user = $this->auth_model->get_user($listSubcomments->user_id);
                     $listSubcomments->shop_name = $user->shop_name ?: $user->username;
                     $listSubcomments->avatar = getAvatar($user);
+                    $listSubcomments->can_delete = false;
+                    if($userId && $userId == $listSubcomments->user_id){
+                        $listSubcomments->can_delete = true;
+                    }
 
                     $dataSubcomments[] = $listSubcomments;
                 }
@@ -446,7 +458,69 @@ class Product extends REST_Controller{
 
     public function addcomment_post()
     {
-        # code...
+        $post = [
+            'user_id' => $this->post('user_id'),
+            'product_id' => $this->post('product_id'),
+            'parent_id' => $this->post('parent_id'),
+            'comment' => $this->post('comment')
+        ];
+
+        if ($this->api_general_settings->getValueOf('product_comments') != 1) {
+            $this->return['message'] = "Tidak dapat membuat komentar";
+            unset($this->return['data']);
+            $this->response($this->return);
+        }
+
+        if (!$post['user_id']) {
+            $post['user_id'] = '0';
+            $post['name'] = $this->post('name');
+            $post['email'] = $this->post('email');
+            if (!$post['name'] || !$post['email'] || !$post['comment']) {
+                $this->return['message'] = "Data Tidak Lengkap 1";
+                unset($this->return['data']);
+                $this->response($this->return);
+            }
+        }else{
+            if (!$post['product_id'] || !$post['comment']) {
+                $this->return['message'] = "Data Tidak Lengkap";
+                unset($this->return['data']);
+                $this->response($this->return);
+            }
+            $post['name'] = '';
+            $post['email'] = '';
+        }
+
+        if (!$post['parent_id']) {
+            $post['parent_id'] = '0';
+        }
+
+        $this->comment_model->add_comment_api($post);
+
+        $this->return['status'] = true;
+        $this->return['message'] = "Success";
+        unset($this->return['data']);
+
+        $this->response($this->return);
+    }
+
+    public function dellcomment_post()
+    {
+        $id = $this->post('comment_id');
+        $userId = $this->post('user_id');
+
+        $comment = $this->comment_model->get_comment($id);
+        $user = $this->auth_model->get_user($userId);
+        if ($user && $comment) {
+            if ($user->id == $comment->user_id) {
+                $this->comment_model->delete_comment($id);
+
+                $this->return['status'] = true;
+                $this->return['message'] = "Success";
+                unset($this->return['data']);
+            }
+        }
+
+        $this->response($this->return);
     }
 
     public function getcondition_get()
