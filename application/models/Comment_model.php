@@ -35,6 +35,31 @@ class Comment_model extends CI_Model
         }
     }
 
+    //add comment api
+    public function add_comment_api($post)
+    {
+        $data = array(
+            'parent_id' => $post['parent_id'],
+            'product_id' => $post['product_id'],
+            'user_id' => $post['user_id'],
+            'name' => $post['name'],
+            'email' => $post['email'],
+            'comment' => $post['comment'],
+            'created_at' => date("Y-m-d H:i:s")
+        );
+
+        if ($data['product_id'] && trim($data['comment'])) {
+            if ($data['user_id'] != 0) {
+                $user = $this->auth_model->get_user($data['user_id']);
+                if (!empty($user)) {
+                    $data['name'] = $user->username;
+                    $data['email'] = $user->email;
+                }
+            }
+            $this->db->insert('comments', $data);
+        }
+    }
+
     //all comments
     public function get_all_comments()
     {
