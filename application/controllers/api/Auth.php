@@ -11,6 +11,7 @@ class Auth extends REST_Controller{
 
 		$this->load->model("api_auth_model");
 		$this->load->model("api_user_model");
+		$this->load->model("api_email_model");
 	}
 
 	public function login_post(){
@@ -36,6 +37,22 @@ class Auth extends REST_Controller{
 		}
 
 
+		$this->response($this->return);
+	}
+
+	public function forgetpass_post()
+	{
+		$email = $this->post('email');
+
+		$user = $this->api_user_model->get_user_by_email($email);
+		if ($user) {
+			$this->api_email_model->send_email_reset_password($user->id);
+			$this->return['status'] = true;
+			$this->return['message'] = 'success';
+		} else {
+			$this->return['message'] = "Kami tidak dapat menemukan pengguna dengan alamat email itu!";
+		}
+		
 		$this->response($this->return);
 	}
 

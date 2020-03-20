@@ -1053,4 +1053,14 @@ class Product_model extends Core_Model
         return false;
     }
 
+    public function get_products_by_product_id($product_id)
+    {
+        $this->build_query_unlocated();
+        $this->db->select('products.*');
+        $this->db->where('products.id', $product_id);
+        $this->db->order_by('products.created_at', 'DESC');
+        $query = $this->db->get('products');
+        return $query->row();
+    }
+
 }
