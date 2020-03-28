@@ -11,6 +11,8 @@ class Messages extends REST_Controller{
 
 		$this->load->model("api_messages_model");
 		$this->load->helper('api_helper');
+		error_reporting(0);
+		ini_set('display_errors', 0);
 	}
 
 	public function addnew_post(){

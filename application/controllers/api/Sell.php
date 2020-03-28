@@ -30,7 +30,7 @@ class Sell extends REST_Controller{
 			'description' => $this->post('description')
 		];
 
-		$user = $this->auth_model->get_user($this->get('user_id'));
+		$user = $this->auth_model->get_user($this->post('user_id'));
 
 		if (!$user->country_id || !$user->state_id || !$user->city_id) {
 			$this->return['message'] = "Lengkapi data!, ke menu Setting->Informasi kontak";

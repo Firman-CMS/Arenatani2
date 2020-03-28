@@ -31,4 +31,23 @@ class Api_profile_model extends CI_Model
         return $query->row();
     }
 
+    public function update_contact_informations($data)
+    {
+        $userId = $data['user_id'];
+        unset($data['user_id']);
+
+        if (empty($data['show_email'])) {
+            $data['show_email'] = 0;
+        }
+        if (empty($data['show_phone'])) {
+            $data['show_phone'] = 0;
+        }
+        if (empty($data['show_location'])) {
+            $data['show_location'] = 0;
+        }
+
+        $this->db->where('id', $userId);
+        return $this->db->update('users', $data);
+    }
+
 }
