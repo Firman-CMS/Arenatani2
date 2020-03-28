@@ -228,7 +228,19 @@ class Profile extends REST_Controller{
 
         $data['count_drafts'] = get_user_drafts_count($user->id);
         $data['total_page'] = ceil(get_user_drafts_count($user->id) / $perPage);
-        $data['products'] = $this->product_model->get_paginated_user_drafts($user->id, $perPage, $offset);
+        $products = $this->product_model->get_paginated_user_drafts($user->id, $perPage, $offset);
+
+        $datas = [];
+        foreach ($products as $productValue) {
+            $dataProduct = listdataProduct($productValue);
+
+            $image = $this->api_file_model->get_image_by_product($productValue->id);
+            $dataProduct['image'] = generateImgProduct($image,'image_small');
+
+
+            $datas[] = $dataProduct;
+        }
+        $data['product'] = $datas;
 
         $this->return['status'] = true;
         $this->return['message'] = "Success";
