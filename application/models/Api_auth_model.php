@@ -69,4 +69,86 @@ class Api_auth_model extends CI_Model
             return false;
         }
     }
+
+    //login with google
+    public function regis_with_google($g_user)
+    {
+        if (empty($g_user['given_name'])) {
+            $g_user['given_name'] = "user-" . uniqid();
+        }
+        $username = $this->generate_uniqe_username($g_user['given_name']);
+        $slug = $this->generate_uniqe_slug($username);
+        //add user to database
+        $data = array(
+            'google_id' => $g_user['id'],
+            'email' => $g_user['email'],
+            'device_id' => $g_user['device_id'],
+            'email_status' => 1,
+            'token' => generate_unique_id(),
+            'username' => $username,
+            'slug' => $slug,
+            'role' => "vendor",
+            'avatar' => $g_user['photo_url'],
+            'user_type' => "google",
+            'created_at' => date('Y-m-d H:i:s'),
+        );
+        $this->db->insert('users', $data);
+        $user = $this->api_user_model->get_user_data($g_user['email']);
+
+        return $user;
+    }
+
+    //generate uniqe username
+    public function generate_uniqe_username($username)
+    {
+        $new_username = $username;
+        if (!empty($this->get_user_by_username($new_username))) {
+            $new_username = $username . " 1";
+            if (!empty($this->get_user_by_username($new_username))) {
+                $new_username = $username . " 2";
+                if (!empty($this->get_user_by_username($new_username))) {
+                    $new_username = $username . " 3";
+                    if (!empty($this->get_user_by_username($new_username))) {
+                        $new_username = $username . "-" . uniqid();
+                    }
+                }
+            }
+        }
+        return $new_username;
+    }
+
+    //generate uniqe slug
+    public function generate_uniqe_slug($username)
+    {
+        $slug = str_slug($username);
+        if (!empty($this->get_user_by_slug($slug))) {
+            $slug = str_slug($username . "-1");
+            if (!empty($this->get_user_by_slug($slug))) {
+                $slug = str_slug($username . "-2");
+                if (!empty($this->get_user_by_slug($slug))) {
+                    $slug = str_slug($username . "-3");
+                    if (!empty($this->get_user_by_slug($slug))) {
+                        $slug = str_slug($username . "-" . uniqid());
+                    }
+                }
+            }
+        }
+        return $slug;
+    }
+
+    public function get_user_by_username($username)
+    {
+        $username = remove_special_characters($username);
+        $this->db->where('username', $username);
+        $query = $this->db->get('users');
+        return $query->row();
+    }
+
+    public function get_user_by_slug($slug)
+    {
+        $slug = clean_slug($slug);
+        $this->db->where('slug', $slug);
+        $query = $this->db->get('users');
+        return $query->row();
+    }
 }

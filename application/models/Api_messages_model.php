@@ -86,12 +86,18 @@ class Api_messages_model extends CI_Model
                             $this->db->where('id', $message->id);
                             $this->db->delete('conversation_messages');
                         }
+                        return true;
+                    }else{
+                        return false;
                     }
                 }
             }else {
                 $this->db->where('id', $conversation->id);
                 $this->db->delete('conversations');
+                return true;
             }
+        }else {
+            return false;
         }
     }
 
