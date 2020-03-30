@@ -50,4 +50,36 @@ class Api_profile_model extends CI_Model
         return $this->db->update('users', $data);
     }
 
+    public function update_profile($data)
+    {
+        $userId = $data['user_id'];
+        unset($data['user_id']);
+
+        $this->db->where('id', $userId);
+        return $this->db->update('users', $data);
+    }
+
+    //check email updated
+    public function check_email_updated($email, $user_id)
+    {
+        $user_id = clean_number($user_id);
+        if ($this->api_general_settings->getValueOf('email_verification') == 1) {
+            $user = $this->auth_model->get_user($user_id);
+            if (!empty($user)) {
+                if ($email != $user->email) {
+                    $this->load->model("email_model");
+                    $this->email_model->send_email_activation($user->id);
+                    $data = array(
+                        'email_status' => 0
+                    );
+
+                    $this->db->where('id', $user->id);
+                    return $this->db->update('users', $data);
+                }
+            }
+        }
+
+        return false;
+    }
+
 }

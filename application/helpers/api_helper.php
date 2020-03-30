@@ -179,7 +179,7 @@ function getAvatar($user)
 	if (!empty($user->avatar) && file_exists(FCPATH . $user->avatar)) {
 	    return base_url() . $user->avatar;
 	} elseif (!empty($user->avatar) && $user->user_type != "registered") {
-	    return base_url() . $user->avatar;
+	    return $user->avatar;
 	} else {
 	    return base_url() . "assets/img/user.png";
 	}

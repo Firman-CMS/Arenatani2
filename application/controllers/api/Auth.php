@@ -134,7 +134,7 @@ class Auth extends REST_Controller{
 
     	$this->return['status'] = true;
     	$this->return['message'] = 'success';
-    	$this->return['get'] = $data;
+    	$this->return['data'] = $data;
 
     	$this->response($this->return);
     }

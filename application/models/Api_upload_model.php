@@ -55,5 +55,20 @@ class Api_upload_model extends CI_Model
 		}
 	}
 
+	//avatar image upload
+	public function avatar_upload($path)
+	{
+		try {
+			$image = new ImageResize($path);
+			$image->quality_jpg = 85;
+			$image->crop(240, 240, true);
+			$new_path = 'uploads/profile/avatar_' . generate_unique_id() . '.jpg';
+			$image->save(FCPATH . $new_path, IMAGETYPE_JPEG);
+			return $new_path;
+		} catch (ImageResizeException $e) {
+			return null;
+		}
+	}
+
 	
 }
