@@ -50,3 +50,6 @@ $lang["daily_plan"] = "Iklan Harian";
 $lang["weekly_plan"] = "Iklan Mingguan";
 $lang["month_count"] = "Jumlah bulan";
 $lang["monthly_plan"] = "Iklan Bulanan";
+$lang["msg_email_unique_error"] = "Email ini sudah di pakai !";
+$lang["msg_username_unique_error"] = "Nama pengguna telah digunakan !";
+$lang["msg_slug_unique_error"] = "Slug pengguna telah digunakan !";
