@@ -53,3 +53,4 @@ $lang["monthly_plan"] = "Iklan Bulanan";
 $lang["msg_email_unique_error"] = "Email ini sudah di pakai !";
 $lang["msg_username_unique_error"] = "Nama pengguna telah digunakan !";
 $lang["msg_slug_unique_error"] = "Slug pengguna telah digunakan !";
+$lang["msg_wrong_old_password"] = "Kata sandi lama salah!";
