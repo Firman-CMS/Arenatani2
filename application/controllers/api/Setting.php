@@ -53,8 +53,16 @@ class Setting extends REST_Controller{
             'username' => $this->post('username'),
             'email' => $this->post('email'),
             'slug' => $this->post('slug'),
-            'send_email_new_message' => $this->post('send_email_new_message')
         );
+
+        foreach ($data as $value) {
+        	if (!$value) {
+        		$this->return['message'] = "Data tidak boleh kosong";
+				return $this->response($this->return);
+        	}
+        }
+
+        $data['send_email_new_message'] = $this->post('send_email_new_message');
 
         //is email unique
         if (!$this->auth_model->is_unique_email($data["email"], $data['user_id'])) {
@@ -177,6 +185,184 @@ class Setting extends REST_Controller{
 				}
 			}
 		}
+	}
+
+	public function shop_get()
+	{
+		$userData = $this->profiles($this->get('user_id'));
+		if ($userData) {
+			$user = [
+				'id' => $userData->id,
+				'shop_name' => $userData->shop_name,
+				'about_me' => $userData->about_me,
+				'show_rss_feeds' => $userData->show_rss_feeds,
+				'send_email_when_item_sold' => $userData->send_email_when_item_sold
+			];
+
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+            $this->return['data'] = $user;
+		}
+
+		$this->response($this->return);
+	}
+
+	public function shop_post()
+	{
+		$data = [
+			'user_id' => $this->post('user_id'),
+			'shop_name' => $this->post('shop_name'),
+			'about_me' => $this->post('about_me'),
+			'show_rss_feeds' => $this->post('show_rss_feeds'),
+			'send_email_when_item_sold' => $this->post('send_email_when_item_sold')
+		];
+
+		if ($this->api_profile_model->update_profile($data)) {
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+		}
+
+		$this->response($this->return);
+	}
+
+	public function shippingaddress_get()
+	{
+		$userData = $this->profiles($this->get('user_id'));
+		if ($userData) {
+			$user = [
+				'id' => $userData->id,
+				'shipping_first_name' => $userData->shipping_first_name,
+				'shipping_last_name' => $userData->shipping_last_name,
+				'shipping_email' => $userData->shipping_email,
+				'shipping_phone_number' => $userData->shipping_phone_number,
+				'shipping_address_1' => $userData->shipping_address_1,
+				'shipping_address_2' => $userData->shipping_address_2,
+				'shipping_country_id' => $userData->shipping_country_id,
+				'shipping_state' => $userData->shipping_state,
+				'shipping_city' => $userData->shipping_city,
+				'shipping_zip_code' => $userData->shipping_zip_code,
+			];
+
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+            $this->return['data'] = $user;
+		}
+
+		$this->response($this->return);
+	}
+
+	public function shippingaddress_post()
+	{
+		$data = [
+			'user_id' => $this->post('user_id'),
+			'shipping_first_name' => $this->post('shipping_first_name'),
+			'shipping_last_name' => $this->post('shipping_last_name'),
+			'shipping_email' => $this->post('shipping_email'),
+			'shipping_phone_number' => $this->post('shipping_phone_number'),
+			'shipping_address_1' => $this->post('shipping_address_1'),
+			'shipping_country_id' => $this->post('shipping_country_id'),
+			'shipping_state' => $this->post('shipping_state'),
+			'shipping_city' => $this->post('shipping_city'),
+			'shipping_zip_code' => $this->post('shipping_zip_code'),
+		];
+
+		foreach ($data as $value) {
+			if (!$value) {
+				$this->return['message'] = "Data tidak boleh kosong";
+				return $this->response($this->return);
+			}
+		}
+
+		$data['shipping_address_2'] = $this->post('shipping_address_2');
+
+		if ($this->api_profile_model->update_profile($data)) {
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+		}
+
+		$this->response($this->return);
+	}
+
+	public function sosmed_get()
+	{
+		$userData = $this->profiles($this->get('user_id'));
+		if ($userData) {
+			$user = [
+				'id' => $userData->id,
+				'facebook_url' => $userData->facebook_url,
+				'twitter_url' => $userData->twitter_url,
+				'instagram_url' => $userData->instagram_url,
+				'pinterest_url' => $userData->pinterest_url,
+				'linkedin_url' => $userData->linkedin_url,
+				'vk_url' => $userData->vk_url,
+				'youtube_url' => $userData->youtube_url
+			];
+
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+            $this->return['data'] = $user;
+		}
+
+		$this->response($this->return);
+	}
+
+	public function sosmed_post()
+	{
+		$data = [
+			'user_id' => $this->post('user_id'),
+			'facebook_url' => $this->post('facebook_url'),
+			'twitter_url' => $this->post('twitter_url'),
+			'instagram_url' => $this->post('instagram_url'),
+			'pinterest_url' => $this->post('pinterest_url'),
+			'linkedin_url' => $this->post('linkedin_url'),
+			'vk_url' => $this->post('vk_url'),
+			'youtube_url' => $this->post('youtube_url')
+		];
+
+		if ($this->api_profile_model->update_profile($data)) {
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+		}
+
+		$this->response($this->return);
+	}
+
+	public function changepassword_post($value='')
+	{
+		$data = array(
+            'user_id' => $this->post('user_id'),
+            'old_password' => $this->post('old_password'),
+            'password' => $this->post('password'),
+            'password_confirm' => $this->post('password_confirm')
+        );
+
+        foreach ($data as $value) {
+			if (!$value) {
+				$this->return['message'] = "Data tidak boleh kosong";
+				return $this->response($this->return);
+			}
+		}
+
+		if ($data['password'] != $data['password_confirm']) {
+			$this->return['message'] = "Konfirmasi Password field does not match with Password field.";
+			return $this->response($this->return);
+		}
+
+		$user = $this->auth_model->get_user($data['user_id']);
+		if (!$user) {
+			$this->return['message'] = "Invalid User";
+			return $this->response($this->return);
+		}
+
+		if ($this->api_profile_model->change_password($data)) {
+			$this->return['status'] = true;
+            $this->return['message'] = "Success";
+        }else {
+        	$this->return['message'] = trans("msg_wrong_old_password");
+			return $this->response($this->return);
+        }
+
+        $this->response($this->return);
 	}
 }
 ?>

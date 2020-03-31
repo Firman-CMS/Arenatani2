@@ -82,4 +82,24 @@ class Api_profile_model extends CI_Model
         return false;
     }
 
+    //change password
+    public function change_password($data)
+    {
+        $this->load->library('bcrypt');
+
+        $user = $this->auth_model->get_user($data['user_id']);
+
+        if ($this->bcrypt->check_password($data['old_password'], $user->password)) {
+
+            $pass = [
+                'password' => $this->bcrypt->hash_password($data['password'])
+            ];
+
+            $this->db->where('id', $user->id);
+            return $this->db->update('users', $pass);
+        } else {
+            return false;
+        }
+    }
+
 }
