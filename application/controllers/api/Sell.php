@@ -379,31 +379,42 @@ class Sell extends REST_Controller{
 	public function uploadImg($productId)
 	{
 		$count = count($_FILES['files']['name']);
+
+		$productImgs = [];
+		$productImages = $this->api_file_model->get_product_images($productId);
+		if ($productImages) {
+			foreach ($productImages as $imgProduct) {
+				array_push($productImgs, $imgProduct->image_default, $imgProduct->image_big, $imgProduct->image_small);
+			}
+		}
+
 		for($i=0;$i<$count;$i++){
 			if(!empty($_FILES['files']['name'][$i])){
-				$_FILES['file']['name'] = $_FILES['files']['name'][$i];
-				$_FILES['file']['type'] = $_FILES['files']['type'][$i];
-				$_FILES['file']['tmp_name'] = $_FILES['files']['tmp_name'][$i];
-				$_FILES['file']['error'] = $_FILES['files']['error'][$i];
-				$_FILES['file']['size'] = $_FILES['files']['size'][$i];
+				#check if images exist or not
+				if (!in_array($_FILES['files']['name'][$i], $productImgs)) {
+					$_FILES['file']['name'] = $_FILES['files']['name'][$i];
+					$_FILES['file']['type'] = $_FILES['files']['type'][$i];
+					$_FILES['file']['tmp_name'] = $_FILES['files']['tmp_name'][$i];
+					$_FILES['file']['error'] = $_FILES['files']['error'][$i];
+					$_FILES['file']['size'] = $_FILES['files']['size'][$i];
 
-				$config['upload_path'] = 'uploads/temp/'; 
-				$config['allowed_types'] = 'jpg|jpeg|png|gif';
-				$config['max_size'] = '5000';
-				$config['file_name'] = 'temp_product'. generate_unique_id();;
+					$config['upload_path'] = 'uploads/temp/'; 
+					$config['allowed_types'] = 'jpg|jpeg|png|gif';
+					$config['max_size'] = '5000';
+					$config['file_name'] = 'temp_product'. generate_unique_id();;
 
-				$this->load->library('upload',$config);
-				if($this->upload->do_upload('file')){
-					$uploadData = $this->upload->data();
-					
-					$temp_path = $uploadData['full_path'];
-					
-					$this->api_upload_model->resizeImage($productId,$temp_path);
+					$this->load->library('upload',$config);
+					if($this->upload->do_upload('file')){
+						$uploadData = $this->upload->data();
+						
+						$temp_path = $uploadData['full_path'];
+						
+						$this->api_upload_model->resizeImage($productId,$temp_path);
 
-					$this->api_upload_model->delete_temp_image($temp_path);
+						$this->api_upload_model->delete_temp_image($temp_path);
 
+					}
 				}
-
 			}
 		}
 	}
