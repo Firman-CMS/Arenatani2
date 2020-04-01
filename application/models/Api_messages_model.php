@@ -117,4 +117,34 @@ class Api_messages_model extends CI_Model
         return $query->result();
     }
 
+    //set conversation messages as read
+    public function set_conversation_messages_as_read($conversation_id, $userId)
+    {
+        $conversation_id = clean_number($conversation_id);
+        $messages = $this->get_unread_messages($conversation_id,$userId);
+        if (!empty($messages)) {
+            foreach ($messages as $message) {
+                if ($message->receiver_id == $userId) {
+                    $data = array(
+                        'is_read' => 1
+                    );
+                    $this->db->where('id', $message->id);
+                    $this->db->update('conversation_messages', $data);
+                }
+            }
+        }
+    }
+
+    //get unread messages
+    public function get_unread_messages($conversation_id, $userId)
+    {
+        $conversation_id = clean_number($conversation_id);
+        $this->db->where('conversation_id', $conversation_id);
+        $this->db->where('receiver_id', $userId);
+        $this->db->where('is_read', 0);
+        $this->db->order_by('id', 'DESC');
+        $query = $this->db->get('conversation_messages');
+        return $query->result();
+    }
+
 }

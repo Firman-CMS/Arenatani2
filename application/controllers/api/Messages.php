@@ -118,7 +118,8 @@ class Messages extends REST_Controller{
         		
         		$data['messages'] = $messageList;
         	}
-
+        	$this->api_messages_model->set_conversation_messages_as_read($conversation->id, $userId);
+        	
         	$this->return['status'] = true;
 			$this->return['message'] = "Success";
 			$this->return['data'] = $data;

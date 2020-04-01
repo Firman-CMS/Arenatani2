@@ -15,6 +15,7 @@ class Setting extends REST_Controller{
 		$this->load->model("api_general_settings");
 		$this->load->model("api_profile_model");
 		$this->load->model("api_upload_model");
+		$this->load->model("api_email_model");
 		$this->load->helper('api_helper');
 
 	}
@@ -329,14 +330,14 @@ class Setting extends REST_Controller{
 
 	public function changepassword_post($value='')
 	{
-		$data = array(
-            'user_id' => $this->post('user_id'),
-            'old_password' => $this->post('old_password'),
-            'password' => $this->post('password'),
-            'password_confirm' => $this->post('password_confirm')
-        );
+		$data = [
+			'user_id' => $this->post('user_id'),
+			'old_password' => $this->post('old_password'),
+			'password' => $this->post('password'),
+			'password_confirm' => $this->post('password_confirm')
+		];
 
-        foreach ($data as $value) {
+		foreach ($data as $value) {
 			if (!$value) {
 				$this->return['message'] = "Data tidak boleh kosong";
 				return $this->response($this->return);
@@ -363,6 +364,18 @@ class Setting extends REST_Controller{
         }
 
         $this->response($this->return);
+	}
+
+	public function resendactivation_post()
+	{
+		$user_id = $this->post('user_id');
+
+		$this->api_email_model->send_email_activation($user_id);
+
+		$this->return['status'] = true;
+		$this->return['message'] = "Success";
+
+		$this->response($this->return);
 	}
 }
 ?>
