@@ -146,12 +146,18 @@ class Product extends REST_Controller{
             }
             $data["related_products"] = $relatedProduct_;
 
-            $data["user"] = $this->auth_model->get_user($productValue->user_id);
-            $data["user"]->avatar = getAvatar($data["user"]);
-            $data["user"]->aktif = timeAgo($data["user"]->last_seen);
-            if ($userId != $data["user"]->id) {
-    			$data["user"]->is_follow = is_user_follows($data["user"]->id, $userId);
-    		}
+            $userOwner = $this->auth_model->get_user($productValue->user_id);
+            if ($userOwner->id != '1') {
+                $data["user"] = $userOwner;
+                $data["user"]->avatar = getAvatar($data["user"]);
+                $data["user"]->aktif = timeAgo($data["user"]->last_seen);
+                if ($userId != $data["user"]->id) {
+        			$data["user"]->is_follow = is_user_follows($data["user"]->id, $userId);
+        		}
+            } else {
+                $data["user"]->id = '';
+                $data["user"]->username = 'admin';
+            }
             
             $userProducts = $this->product_model->get_user_products($data["user"]->slug, 3, $data["product"]['id']);
             $userProductList = [];
